@@ -8,7 +8,7 @@ const Sidebar = () => {
   const dispatch = useDispatch();
 
   const menuItems = [
-    { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
+    { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
     { icon: Briefcase, label: 'Projects', path: '/projects' },
     { icon: CheckSquare, label: 'Tasks', path: '/tasks' },
   ];

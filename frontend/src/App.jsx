@@ -7,6 +7,7 @@ import Projects from './pages/Projects';
 import Tasks from './pages/Tasks';
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
+import ProflowLanding from './pages/LandingPage';
 
 const ProtectedRoute = ({ children }) => {
   const { user } = useSelector((state) => state.auth);
@@ -25,10 +26,17 @@ function App() {
           {user && <Navbar />}
           <main className={`flex-1 ${user ? 'p-6' : ''}`}>
             <Routes>
-              <Route path="/login" element={!user ? <Login /> : <Navigate to="/" />} />
-              <Route path="/register" element={!user ? <Register /> : <Navigate to="/" />} />
+              {/* Show Landing page on "/" for guests, or redirect to dashboard if logged in */}
+              <Route 
+                path="/" 
+                element={!user ? <ProflowLanding /> : <Navigate to="/dashboard" replace />} 
+              />
+
+              <Route path="/login" element={!user ? <Login /> : <Navigate to="/dashboard" replace />} />
+              <Route path="/register" element={!user ? <Register /> : <Navigate to="/dashboard" replace />} />
               
-              <Route path="/" element={
+              {/* Protected App Routes */}
+              <Route path="/dashboard" element={
                 <ProtectedRoute>
                   <Dashboard />
                 </ProtectedRoute>
@@ -45,6 +53,9 @@ function App() {
                   <Tasks />
                 </ProtectedRoute>
               } />
+
+              {/* Catch-all redirect */}
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </main>
         </div>
