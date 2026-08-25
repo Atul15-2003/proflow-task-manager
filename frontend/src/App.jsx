@@ -27,21 +27,21 @@ function App() {
           <main className={`flex-1 ${user ? 'p-6' : ''}`}>
             <Routes>
               {/* Show Landing page on "/" for guests, or redirect to dashboard if logged in */}
-              <Route 
-                path="/" 
-                element={!user ? <ProflowLanding /> : <Navigate to="/dashboard" replace />} 
+              <Route
+                path="/"
+                element={!user ? <ProflowLanding /> : <Navigate to="/dashboard" replace />}
               />
 
               <Route path="/login" element={!user ? <Login /> : <Navigate to="/dashboard" replace />} />
               <Route path="/register" element={!user ? <Register /> : <Navigate to="/dashboard" replace />} />
-              
+
               {/* Protected App Routes */}
               <Route path="/dashboard" element={
                 <ProtectedRoute>
                   <Dashboard />
                 </ProtectedRoute>
               } />
-              
+
               <Route path="/projects" element={
                 <ProtectedRoute>
                   <Projects />
