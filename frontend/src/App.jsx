@@ -1,5 +1,7 @@
+import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import api from './services/api';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
@@ -17,6 +19,11 @@ const ProtectedRoute = ({ children }) => {
 
 function App() {
   const { user } = useSelector((state) => state.auth);
+
+  // Silently wake the sleeping Render container while the user reads the page.
+  useEffect(() => {
+    api.get('/health', { timeout: 35000 }).catch(() => {});
+  }, []);
 
   return (
     <Router>
