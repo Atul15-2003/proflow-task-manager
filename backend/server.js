@@ -8,7 +8,7 @@ const projectRoutes = require('./routes/project');
 const taskRoutes = require('./routes/task');
 const { errorHandler } = require('./middleware/error');
 
-dotenv.config();
+dotenv.config({ path: path.join(__dirname, '.env') });
 
 const app = express();
 
