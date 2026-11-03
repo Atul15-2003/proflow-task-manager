@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Briefcase, Plus, Search, MoreVertical, ExternalLink, Trash2 } from 'lucide-react';
+import { Briefcase, Plus, MoreVertical, ExternalLink, Trash2 } from 'lucide-react';
 import api from '../services/api';
+import ProjectModal from '../components/ProjectModal';
 
 const Projects = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [newProject, setNewProject] = useState({ name: '', description: '', status: 'active' });
 
   const fetchProjects = async () => {
     try {
@@ -22,18 +22,6 @@ const Projects = () => {
   useEffect(() => {
     fetchProjects();
   }, []);
-
-  const handleCreate = async (e) => {
-    e.preventDefault();
-    try {
-      await api.post('/projects', newProject);
-      setShowModal(false);
-      setNewProject({ name: '', description: '', status: 'active' });
-      fetchProjects();
-    } catch (err) {
-      console.error(err);
-    }
-  };
 
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure?')) {
@@ -104,52 +92,11 @@ const Projects = () => {
         </div>
       )}
 
-      {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl w-full max-w-md p-8 shadow-2xl animate-in zoom-in-95 duration-200">
-            <h2 className="text-2xl font-bold text-slate-900 mb-6">Create New Project</h2>
-            <form onSubmit={handleCreate} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1.5">Project Name</label>
-                <input
-                  type="text"
-                  required
-                  className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all"
-                  placeholder="E.g. Mobile App Redesign"
-                  value={newProject.name}
-                  onChange={(e) => setNewProject({ ...newProject, name: e.target.value })}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1.5">Description</label>
-                <textarea
-                  required
-                  rows="3"
-                  className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all"
-                  placeholder="Describe the project goals..."
-                  value={newProject.description}
-                  onChange={(e) => setNewProject({ ...newProject, description: e.target.value })}
-                ></textarea>
-              </div>
-              <div className="flex gap-3 pt-4">
-                <button 
-                  type="button"
-                  onClick={() => setShowModal(false)}
-                  className="flex-1 px-4 py-2.5 border border-slate-200 rounded-xl font-semibold text-slate-600 hover:bg-slate-50 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button 
-                  type="submit"
-                  className="flex-1 px-4 py-2.5 bg-primary-600 text-white rounded-xl font-semibold hover:bg-primary-700 transition-colors shadow-lg shadow-primary-600/20"
-                >
-                  Create Project
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <ProjectModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        onSuccess={() => fetchProjects()}
+      />
     </div>
   );
 };

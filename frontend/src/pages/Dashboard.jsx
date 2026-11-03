@@ -1,15 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { 
   Briefcase, 
   CheckCircle2, 
   Clock, 
   AlertCircle, 
-  TrendingUp,
-  ArrowUpRight,
-  Plus
+  TrendingUp, 
+  ArrowUpRight, 
+  Plus,
+  Check
 } from 'lucide-react';
 import api from '../services/api';
+import ProjectModal from '../components/ProjectModal';
 
 const StatCard = ({ icon: Icon, label, value, color, trend }) => (
   <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
@@ -39,45 +41,65 @@ const Dashboard = () => {
   });
   const [recentTasks, setRecentTasks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showProjectModal, setShowProjectModal] = useState(false);
+  const [toastMessage, setToastMessage] = useState(null);
+
+  const fetchDashboardData = useCallback(async () => {
+    try {
+      const [projRes, taskRes] = await Promise.all([
+        api.get('/projects'),
+        api.get('/tasks')
+      ]);
+      
+      const tasks = taskRes.data.data;
+      const today = new Date();
+      setStats({
+        projects: projRes.data.count,
+        tasks: tasks.length,
+        completedTasks: tasks.filter(t => t.status === 'done').length,
+        pendingTasks: tasks.filter(t => t.status !== 'done').length,
+        overdueTasks: tasks.filter(t => t.status !== 'done' && t.dueDate && new Date(t.dueDate) < today).length
+      });
+      setRecentTasks(tasks.slice(0, 5));
+    } catch (err) {
+      console.error('Error fetching dashboard data:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        const [projRes, taskRes] = await Promise.all([
-          api.get('/projects'),
-          api.get('/tasks')
-        ]);
-        
-        const tasks = taskRes.data.data;
-        const today = new Date();
-        setStats({
-          projects: projRes.data.count,
-          tasks: tasks.length,
-          completedTasks: tasks.filter(t => t.status === 'done').length,
-          pendingTasks: tasks.filter(t => t.status !== 'done').length,
-          overdueTasks: tasks.filter(t => t.status !== 'done' && t.dueDate && new Date(t.dueDate) < today).length
-        });
-        setRecentTasks(tasks.slice(0, 5));
-      } catch (err) {
-        console.error('Error fetching dashboard data:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchDashboardData();
-  }, []);
+  }, [fetchDashboardData]);
+
+  const handleProjectCreated = (newProject) => {
+    setToastMessage(`Project "${newProject.name}" created successfully!`);
+    fetchDashboardData();
+    setTimeout(() => {
+      setToastMessage(null);
+    }, 4000);
+  };
 
   if (loading) return <div className="flex items-center justify-center h-full text-slate-500">Loading Dashboard...</div>;
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-8 animate-in fade-in duration-500 relative">
+      {toastMessage && (
+        <div className="fixed top-20 right-6 z-50 bg-emerald-600 text-white px-5 py-3 rounded-xl shadow-xl flex items-center gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
+          <Check size={18} className="flex-shrink-0" />
+          <span className="text-sm font-semibold">{toastMessage}</span>
+        </div>
+      )}
+
       <div className="flex justify-between items-end">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Welcome back, {user?.name}! 👋</h1>
           <p className="text-slate-500 mt-1">Here's what's happening with your projects today.</p>
         </div>
-        <button className="bg-primary-600 text-white px-4 py-2.5 rounded-xl font-semibold flex items-center gap-2 hover:bg-primary-700 transition-all shadow-lg shadow-primary-600/20">
+        <button
+          onClick={() => setShowProjectModal(true)}
+          className="bg-primary-600 text-white px-4 py-2.5 rounded-xl font-semibold flex items-center gap-2 hover:bg-primary-700 transition-all shadow-lg shadow-primary-600/20 active:scale-95"
+        >
           <Plus size={18} /> New Project
         </button>
       </div>
@@ -197,6 +219,12 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+
+      <ProjectModal
+        isOpen={showProjectModal}
+        onClose={() => setShowProjectModal(false)}
+        onSuccess={handleProjectCreated}
+      />
     </div>
   );
 };

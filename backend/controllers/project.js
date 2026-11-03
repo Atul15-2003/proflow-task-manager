@@ -37,6 +37,10 @@ exports.getProject = async (req, res, next) => {
 
 exports.createProject = async (req, res, next) => {
     try {
+        if (!req.body.name || !req.body.name.trim()) {
+            return res.status(400).json({ success: false, error: 'Please add a project name' });
+        }
+        req.body.name = req.body.name.trim();
         req.body.owner = req.user.id;
         const project = await Project.create(req.body);
         res.status(201).json({ success: true, data: project });

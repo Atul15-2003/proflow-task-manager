@@ -68,7 +68,7 @@ const Register = () => {
                 type="text"
                 name="name"
                 required
-                className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl py-3.5 pl-12 pr-4 text-slate-900 placeholder-slate-400 outline-none focus:border-indigo-500 focus:bg-white transition-all duration-300"
+                className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl py-3.5 pl-12 pr-4 text-slate-900 caret-slate-900 placeholder-slate-400 outline-none focus:border-indigo-500 focus:bg-white transition-all duration-300"
                 placeholder="John Doe"
                 value={formData.name}
                 onChange={handleChange}
@@ -84,7 +84,7 @@ const Register = () => {
                 type="email"
                 name="email"
                 required
-                className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl py-3.5 pl-12 pr-4 text-slate-900 placeholder-slate-400 outline-none focus:border-indigo-500 focus:bg-white transition-all duration-300"
+                className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl py-3.5 pl-12 pr-4 text-slate-900 caret-slate-900 placeholder-slate-400 outline-none focus:border-indigo-500 focus:bg-white transition-all duration-300"
                 placeholder="john@company.com"
                 value={formData.email}
                 onChange={handleChange}
@@ -100,7 +100,7 @@ const Register = () => {
                 type="password"
                 name="password"
                 required
-                className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl py-3.5 pl-12 pr-4 text-slate-900 placeholder-slate-400 outline-none focus:border-indigo-500 focus:bg-white transition-all duration-300"
+                className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl py-3.5 pl-12 pr-4 text-slate-900 caret-slate-900 placeholder-slate-400 outline-none focus:border-indigo-500 focus:bg-white transition-all duration-300"
                 placeholder="••••••••"
                 value={formData.password}
                 onChange={handleChange}

@@ -9,8 +9,11 @@ const projectSchema = new mongoose.Schema({
     },
     description: {
         type: String,
-        required: [true, 'Please add a description'],
+        default: '',
         maxlength: [500, 'Description can not be more than 500 characters']
+    },
+    dueDate: {
+        type: Date
     },
     status: {
         type: String,
