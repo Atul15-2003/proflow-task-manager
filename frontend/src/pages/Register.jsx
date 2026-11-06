@@ -2,15 +2,14 @@ import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
 import { register, clearError } from '../slices/authSlice';
-import { UserPlus, Mail, Lock, User, Shield, Loader2 } from 'lucide-react';
+import { UserPlus, Mail, Lock, User, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const Register = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    password: '',
-    role: 'member'
+    password: ''
   });
   
   const dispatch = useDispatch();
@@ -105,22 +104,6 @@ const Register = () => {
                 value={formData.password}
                 onChange={handleChange}
               />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-slate-700 text-sm font-bold mb-1.5 ml-1">Account Type</label>
-            <div className="relative group">
-              <Shield className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors w-5 h-5" />
-              <select
-                name="role"
-                className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl py-3.5 pl-12 pr-4 text-slate-900 focus:border-indigo-500 focus:bg-white transition-all duration-300 outline-none appearance-none"
-                value={formData.role}
-                onChange={handleChange}
-              >
-                <option value="member">Member</option>
-                <option value="admin">Admin</option>
-              </select>
             </div>
           </div>
 
