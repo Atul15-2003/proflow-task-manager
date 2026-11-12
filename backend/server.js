@@ -4,6 +4,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
 const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
 const authRoutes = require('./routes/auth');
 const projectRoutes = require('./routes/project');
 const taskRoutes = require('./routes/task');
@@ -13,6 +14,8 @@ dotenv.config({ path: path.join(__dirname, '.env') });
 
 const app = express();
 app.set('trust proxy', 1);
+app.disable('x-powered-by');
+app.use(helmet());
 
 const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
