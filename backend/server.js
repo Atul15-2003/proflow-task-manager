@@ -17,6 +17,7 @@ app.set('trust proxy', 1);
 const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 10,
+    skipSuccessfulRequests: true,
     standardHeaders: true,
     legacyHeaders: false,
     message: { success: false, error: 'Too many requests, please try again later' }
@@ -31,7 +32,8 @@ app.get('/api/health', (req, res) => {
     res.status(200).json({ status: 'awake' });
 });
 
-app.use('/api/auth', authLimiter, authRoutes);
+app.use(['/api/auth/login', '/api/auth/register'], authLimiter);
+app.use('/api/auth', authRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/tasks', taskRoutes);
 
