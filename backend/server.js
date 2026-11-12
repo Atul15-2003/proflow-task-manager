@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
+const rateLimit = require('express-rate-limit');
 const authRoutes = require('./routes/auth');
 const projectRoutes = require('./routes/project');
 const taskRoutes = require('./routes/task');
@@ -11,6 +12,24 @@ const { errorHandler } = require('./middleware/error');
 dotenv.config({ path: path.join(__dirname, '.env') });
 
 const app = express();
+app.set('trust proxy', 1);
+
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 10,
+    skipSuccessfulRequests: true,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { success: false, error: 'Too many requests, please try again later' }
+});
+
+const registerLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000,
+    max: 20,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { success: false, error: 'Too many accounts created from this IP, please try again later' }
+});
 
 app.use(cors({
     origin: [process.env.FRONTEND_URL, 'http://localhost:5173'].filter(Boolean),
@@ -21,6 +40,8 @@ app.get('/api/health', (req, res) => {
     res.status(200).json({ status: 'awake' });
 });
 
+app.use(['/api/auth/login', '/api/auth/register'], authLimiter);
+app.post('/api/auth/register', registerLimiter);
 app.use('/api/auth', authRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/tasks', taskRoutes);
