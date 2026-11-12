@@ -23,6 +23,14 @@ const authLimiter = rateLimit({
     message: { success: false, error: 'Too many requests, please try again later' }
 });
 
+const registerLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000,
+    max: 20,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { success: false, error: 'Too many accounts created from this IP, please try again later' }
+});
+
 app.use(cors({
     origin: [process.env.FRONTEND_URL, 'http://localhost:5173'].filter(Boolean),
 }));
@@ -33,6 +41,7 @@ app.get('/api/health', (req, res) => {
 });
 
 app.use(['/api/auth/login', '/api/auth/register'], authLimiter);
+app.post('/api/auth/register', registerLimiter);
 app.use('/api/auth', authRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/tasks', taskRoutes);
