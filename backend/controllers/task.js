@@ -1,10 +1,15 @@
 const Task = require('../models/Task');
 const Project = require('../models/Project');
+const hasProjectAccess = require('../utils/projectAccess');
 
 exports.getTasks = async (req, res, next) => {
     try {
         let query;
         if (req.query.projectId) {
+            const project = await Project.findById(req.query.projectId);
+            if (!project || !hasProjectAccess(project, req.user)) {
+                return res.status(404).json({ success: false, error: 'Project not found' });
+            }
             query = Task.find({ project: req.query.projectId }).populate('assignedTo', 'name email');
         } else {
             query = Task.find({
@@ -27,7 +32,7 @@ exports.createTask = async (req, res, next) => {
         req.body.createdBy = req.user.id;
         
         const project = await Project.findById(req.body.project);
-        if (!project) {
+        if (!project || !hasProjectAccess(project, req.user)) {
             return res.status(404).json({ success: false, error: 'Project not found' });
         }
 
@@ -46,6 +51,14 @@ exports.updateTask = async (req, res, next) => {
             return res.status(404).json({ success: false, error: 'Task not found' });
         }
 
+        const project = await Project.findById(task.project);
+        if (!project || !hasProjectAccess(project, req.user)) {
+            return res.status(404).json({ success: false, error: 'Project not found' });
+        }
+
+        delete req.body.project;
+        delete req.body.createdBy;
+
         task = await Task.findByIdAndUpdate(req.params.id, req.body, {
             new: true,
             runValidators: true
@@ -63,6 +76,11 @@ exports.deleteTask = async (req, res, next) => {
 
         if (!task) {
             return res.status(404).json({ success: false, error: 'Task not found' });
+        }
+
+        const project = await Project.findById(task.project);
+        if (!project || !hasProjectAccess(project, req.user)) {
+            return res.status(404).json({ success: false, error: 'Project not found' });
         }
 
         await task.deleteOne();

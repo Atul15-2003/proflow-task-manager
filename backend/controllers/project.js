@@ -1,4 +1,5 @@
 const Project = require('../models/Project');
+const hasProjectAccess = require('../utils/projectAccess');
 
 exports.getProjects = async (req, res, next) => {
     try {
@@ -25,7 +26,7 @@ exports.getProject = async (req, res, next) => {
     try {
         const project = await Project.findById(req.params.id).populate('members', 'name email');
 
-        if (!project) {
+        if (!project || !hasProjectAccess(project, req.user)) {
             return res.status(404).json({ success: false, error: 'Project not found' });
         }
 
@@ -53,7 +54,7 @@ exports.updateProject = async (req, res, next) => {
     try {
         let project = await Project.findById(req.params.id);
 
-        if (!project) {
+        if (!project || !hasProjectAccess(project, req.user)) {
             return res.status(404).json({ success: false, error: 'Project not found' });
         }
 
@@ -76,7 +77,7 @@ exports.deleteProject = async (req, res, next) => {
     try {
         const project = await Project.findById(req.params.id);
 
-        if (!project) {
+        if (!project || !hasProjectAccess(project, req.user)) {
             return res.status(404).json({ success: false, error: 'Project not found' });
         }
 
